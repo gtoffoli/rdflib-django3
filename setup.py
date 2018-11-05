@@ -14,13 +14,10 @@ setup(
     description="Store implementation for RDFlib using Django models as its backend (fork)",  # noqa
     long_description=read('README.rst'),
     keywords='django rdf rdflib store',
-
-    author='Yigal Duppen',
-    author_email='yigal@publysher.nl',
-
+    author='Alexander K., Yigal Duppen',
+    author_email='devkral@web.de, yigal@publysher.nl',
     packages=find_packages(exclude=["test"]),
     zip_safe=True,
-
     install_requires=['rdflib>=3.2.1'],
     entry_points={
         'rdf.plugins.store': [

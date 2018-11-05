@@ -438,10 +438,34 @@ class ContextTest(TestCase):
         self.addStuff()
 
         # unbound subjects with context
-        self.assertEquals(len(list(c1triples((Any, self.likes, self.pizza)))), 2)
-        self.assertEquals(len(list(c1triples((Any, self.hates, self.pizza)))), 1)
-        self.assertEquals(len(list(c1triples((Any, self.likes, self.cheese)))), 3)
-        self.assertEquals(len(list(c1triples((Any, self.hates, self.cheese)))), 0)
+        self.assertEquals(
+            len(
+                list(
+                    c1triples((Any, self.likes, self.pizza))
+                )
+            ), 2
+        )
+        self.assertEquals(
+            len(
+                list(
+                    c1triples((Any, self.hates, self.pizza))
+                )
+            ), 1
+        )
+        self.assertEquals(
+            len(
+                list(
+                    c1triples((Any, self.likes, self.cheese))
+                )
+            ), 3
+        )
+        self.assertEquals(
+            len(
+                list(
+                    c1triples((Any, self.hates, self.cheese))
+                )
+            ), 1
+        )
 
         # unbound subjects without context, same results!
         self.assertEquals(len(list(triples((Any, self.likes, self.pizza)))), 2)
@@ -520,8 +544,18 @@ class ContextTest(TestCase):
             self.assertEquals(set(c.objects(self.bob, self.likes)), {self.cheese})
 
             # unbound predicates
-            self.assertEquals(set(c.predicates(self.michel, self.cheese)), {self.likes})
-            self.assertEquals(set(c.predicates(self.tarek, self.cheese)), {self.likes})
+            self.assertEquals(
+                set(
+                    c.predicates(self.michel, self.cheese)
+                ),
+                {self.likes}
+            )
+            self.assertEquals(
+                set(
+                    c.predicates(self.tarek, self.cheese)
+                ),
+                {self.likes}
+            )
             self.assertEquals(set(c.predicates(self.bob, self.pizza)), {self.hates})
             self.assertEquals(set(c.predicates(self.bob, self.michel)), {self.hates})
 
