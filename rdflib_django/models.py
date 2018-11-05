@@ -4,6 +4,7 @@ The rdflib_django implementation uses Django models to store its triples.
 The underlying models are Resource centric, because rdflib-django is intended
 to be used for publishing resources.
 """  # noqa: E501
+import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rdflib_django import fields
@@ -20,8 +21,8 @@ class NamedGraph(models.Model):
         verbose_name = _("named graph")
         verbose_name_plural = _("named graphs")
 
-    def __unicode__(self):
-        return u"{0}".format(self.identifier, "identifier")
+    def __str__(self):
+        return "{}-{}".format(self.identifier, "identifier")
 
 
 class NamespaceModel(models.Model):
@@ -30,7 +31,7 @@ class NamespaceModel(models.Model):
 
     In essence, a namespace consists of a prefix and a URI. However, the namespaces in rdflib_django
     also have an extra field called '`fixed`' - this is used to mark namespaces that cannot be
-    remapped such as ``xml``, ``rdf`` and ``rdfs``.
+    remapped such as ``xsd``, ``xml``, ``rdf`` and ``rdfs``.
     """  # noqa: E501
 
     prefix = models.CharField(
@@ -47,8 +48,8 @@ class NamespaceModel(models.Model):
         verbose_name = _("namespace")
         verbose_name_plural = _("namespaces")
 
-    def __unicode__(self):
-        return "@prefix {0}: <{1}>".format(self.prefix, self.uri)
+    def __str__(self):
+        return "@prefix {}: <{}>".format(self.prefix, self.uri)
 
 
 class URIStatement(models.Model):
@@ -56,7 +57,7 @@ class URIStatement(models.Model):
     Statement where the object is a URI.
     """
 
-    id = models.UUIDField("ID", primary_key=True)
+    id = models.UUIDField("ID", default=uuid.uuid4, primary_key=True)
     subject = fields.URIField(verbose_name=_("Subject"), db_index=True)
     predicate = fields.URIField(_("Predicate"), db_index=True)
     object = fields.URIField(_("Object"), db_index=True)
@@ -83,7 +84,7 @@ class LiteralStatement(models.Model):
     Statement where the object is a literal.
     """
 
-    id = models.UUIDField("ID", primary_key=True)
+    id = models.UUIDField("ID", default=uuid.uuid4, primary_key=True)
     subject = fields.URIField(verbose_name=_("Subject"), db_index=True)
     predicate = fields.URIField(_("Predicate"), db_index=True)
     object = fields.LiteralField(_("Object"), db_index=True)

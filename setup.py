@@ -36,5 +36,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    test_suite="test.test_all"
+    #test_suite="test.test_all"
 )

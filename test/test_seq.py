@@ -28,10 +28,10 @@ class SeqTest(TestCase):
         items = self.store.seq(URIRef("http://example.org/Seq"))
         self.assertEquals(len(items), 6)
         self.assertEquals(
-            items[-1].concrete(), URIRef("http://example.org/six")
+            items[-1], URIRef("http://example.org/six")
         )
         self.assertEquals(
-            items[2].concrete(), URIRef("http://example.org/three")
+            items[2], URIRef("http://example.org/three")
         )
         # just make sure we can serialize
         self.store.serialize()

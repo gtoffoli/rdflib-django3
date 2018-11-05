@@ -47,6 +47,7 @@ class NamespaceTest(TestCase):
         g = Graph(store=self.store)
         self.assertIn(XML_NAMESPACE, list(g.namespaces()))
 
+        # breaks test
         g.bind("hello-world", XML_NAMESPACE[1])
         self.assertIn(XML_NAMESPACE, list(g.namespaces()))
 

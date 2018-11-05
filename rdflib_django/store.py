@@ -2,6 +2,8 @@
 Essential implementation of the Store interface defined by RDF lib.
 """
 from django.db.utils import IntegrityError
+from django.db import transaction
+from django.db.models import Q
 import rdflib
 from rdflib.store import VALID_STORE
 from rdflib.term import Literal, Identifier
@@ -10,12 +12,6 @@ from rdflib_django.models import NamespaceModel
 
 
 DEFAULT_STORE = "Default Store"
-
-DEFAULT_NAMESPACES = (
-    ("xml", u"http://www.w3.org/XML/1998/namespace"),
-    ("rdf", u"http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
-    ("rdfs", u"http://www.w3.org/2000/01/rdf-schema#")
-    )
 
 
 def _get_query_sets_for_object(o):
@@ -241,17 +237,19 @@ class DjangoStore(rdflib.store.Store):
     # NAMESPACE MANAGEMENT
 
     def bind(self, prefix, namespace):
-        for ns in DEFAULT_NAMESPACES:
-            if ns[0] == prefix or str(ns[1]) == str(namespace):
-                return
+        NamespaceModel.objects.filter(
+            Q(uri=namespace) | Q(prefix=prefix),
+            fixed=False
+        ).delete()
 
         try:
-            ns = NamespaceModel(prefix=prefix, uri=namespace)
-            ns.save()
+            with transaction.atomic():
+                NamespaceModel.objects.create(
+                    prefix=prefix, uri=namespace, fixed=False
+                )
         except IntegrityError:
-            NamespaceModel.objects.filter(prefix=prefix).delete()
-            NamespaceModel.objects.filter(uri=namespace).delete()
-            NamespaceModel(prefix=prefix, uri=namespace).save()
+            # is a fixed namespace
+            pass
 
     def prefix(self, namespace):
         try:
@@ -268,5 +266,6 @@ class DjangoStore(rdflib.store.Store):
             return None
 
     def namespaces(self):
-        for ns in NamespaceModel.objects.all():
-            yield ns.prefix, ns.uri
+        return NamespaceModel.objects.all().values_list(
+            "prefix", "uri"
+        )

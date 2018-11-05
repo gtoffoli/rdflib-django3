@@ -401,7 +401,7 @@ class ContextTest(TestCase):
         self.addStuffInMultipleContexts()
 
         def cid(c):
-            if not isinstance(c, basestring):
+            if not isinstance(c, str):
                 return c.identifier
             return c
 
@@ -464,7 +464,7 @@ class ContextTest(TestCase):
                 list(
                     c1triples((Any, self.hates, self.cheese))
                 )
-            ), 1
+            ), 0
         )
 
         # unbound subjects without context, same results!

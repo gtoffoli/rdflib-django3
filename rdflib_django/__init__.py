@@ -13,3 +13,4 @@ from rdflib.store import Store
 
 
 register('Django', Store, 'rdflib_django.store', 'DjangoStore')
+default_app_config = 'rdflib_django.apps.RdflibDjangoConfig'
