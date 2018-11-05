@@ -25,20 +25,16 @@ class LiteralField(models.TextField):
         return Literal(parts[0], parts[1] or None, parts[2] or None)
 
     def to_python(self, value):
-        if value is None:
+        if isinstance(value, Literal):
             return value
 
-        if isinstance(value, Literal):
+        if value is None:
             return value
 
         parts = value.split('^^')
         if len(parts) != 3:
             raise ValueError("Wrong value: {0}".format(value))
         return Literal(parts[0], parts[1] or None, parts[2] or None)
-
-    def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return self.get_prep_value(value)
 
     def get_prep_value(self, value):
         if not isinstance(value, Literal):
@@ -49,9 +45,9 @@ class LiteralField(models.TextField):
         return (
             str(value) +
             "^^" +
-            (value.language or '') +
+            str(value.language or '') +
             "^^" +
-            (value.datatype or '')
+            str(value.datatype or '')
         )
 
 
@@ -107,9 +103,6 @@ class URIField(models.CharField):
     def to_python(self, value):
         return deserialize_uri(value)
 
-    def value_to_string(self, obj):
-        return serialize_uri(self._get_val_from_obj(obj))
-
     def get_prep_value(self, value):
         return serialize_uri(value)
 
@@ -132,10 +125,6 @@ class GraphReferenceField(models.CharField):
             return value.identifier
 
         return deserialize_uri(value)
-
-    def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return self.get_prep_value(value)
 
     def get_prep_value(self, value):
         if isinstance(value, Graph):
