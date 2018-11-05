@@ -11,6 +11,8 @@ DJANGO_RDFLIB_DEVELOP = True
 
 DB_PATH = os.path.abspath(os.path.join(__file__, '..', 'rdflib_django.db'))
 
+# TEST_RUNNER = "unittest.TextTestRunner"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -38,7 +40,7 @@ INSTALLED_APPS = (
 
     'rdflib_django',
     )
-ROOT_URLCONF = 'tests.urls'
+ROOT_URLCONF = 'test.urls'
 
 LOGGING = {
     'version': 1,

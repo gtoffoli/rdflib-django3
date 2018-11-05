@@ -7,13 +7,14 @@ import sys
 import doctest
 import unittest
 import django
+from django.test.utils import get_runner
 from django.conf import settings
 up = os.path.dirname
 rp = os.path.realpath
-sys.path.insert(0, up(up(rp(__file__))))
-import test.testsettings  # noqa: E402
-settings.configure(default_settings=test.testsettings)
-django.setup()
+#sys.path.insert(0, up(up(rp(__file__))))
+#import test.testsettings  # noqa: E402
+#settings.configure(default_settings=test.testsettings)
+#django.setup()
 
 import rdflib_django  # noqa: E402
 from rdflib_django import store  # noqa: E402
@@ -35,3 +36,19 @@ def suite():
     s.addTest(unittest.findTestCases(test_seq))
     s.addTest(unittest.findTestCases(test_namespaces))
     return s
+
+
+test_labels = [
+    "test.test_store", "test.test_rdflib",
+    "test.test_seq", "test.test_namespaces"
+]
+
+if __name__ == '__main__':
+    TestRunner = get_runner(settings)
+
+    test_runner = TestRunner()
+    # failures = test_runner.run(suite())
+    failures = test_runner.run_tests(test_labels)
+
+    if failures:
+        sys.exit(1)
