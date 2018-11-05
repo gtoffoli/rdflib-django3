@@ -1,13 +1,15 @@
 """
 Settings for testing the application.
 """
+from django.conf.global_settings import *  # noqa
 import os
 
 DEBUG = True
+SECRET_KEY = "FKJSLSOIIDSPOSOPDS"
 
 DJANGO_RDFLIB_DEVELOP = True
 
-DB_PATH = os.path.abspath(os.path.join(__file__, '..', '..', '..', 'rdflib_django.db'))
+DB_PATH = os.path.abspath(os.path.join(__file__, '..', 'rdflib_django.db'))
 
 DATABASES = {
     'default': {
@@ -36,7 +38,7 @@ INSTALLED_APPS = (
 
     'rdflib_django',
     )
-ROOT_URLCONF = 'rdflib_django.urls'
+ROOT_URLCONF = 'tests.urls'
 
 LOGGING = {
     'version': 1,

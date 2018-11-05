@@ -14,16 +14,19 @@ class Command(BaseCommand):
     """
 
     option_list = BaseCommand.option_list + (
-        make_option('--context', '-c', type='string', dest='context',
-            help='Only RDF data from the context with this identifier will be exported. If not specified, a new blank ' +
-                 'context is created.'),
+        make_option(
+            '--context', '-c', type='string', dest='context',
+            help='Only RDF data from the context with this identifier will be exported. If not specified, a new blank context is created.'  # noqa: E501
+        ),
 
         make_option('--store', '-s', type='string', dest='store',
-            help='RDF data will be exported from the store with this identifier. If not specified, the default store ' +
-                 'is used.'),
+            help='RDF data will be exported from the store with this identifier. If not specified, the default store is used.'  # noqa: E501
+        ),
 
-        make_option('--format', '-f', type='string', dest='format', default='xml',
-            help='Format of the RDF data. This option accepts all formats allowed by rdflib. Defaults to xml.')
+        make_option(
+            '--format', '-f', type='string', dest='format', default='xml',
+            help='Format of the RDF data. This option accepts all formats allowed by rdflib. Defaults to xml.'  # noqa: E501
+        )
     )
 
     help = """Exports an RDF resource.
@@ -41,9 +44,11 @@ Examples:
         target = args[0] if args else sys.stdout
 
         if context_id:
-            graph = utils.get_named_graph(URIRef(context_id), store_id=store_id)
+            graph = utils.get_named_graph(
+                URIRef(context_id), store_id=store_id
+            )
         else:
             graph = utils.get_conjunctive_graph(store_id)
 
-        #noinspection PyUnresolvedReferences
+        # noinspection PyUnresolvedReferences
         graph.serialize(target, format=options.get('format'))

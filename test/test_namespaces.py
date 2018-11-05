@@ -1,7 +1,7 @@
 """
 Unittests for namespace management.
 """
-from django.utils import unittest
+from django.test import TestCase
 from rdflib.graph import Graph
 from rdflib.term import URIRef
 from rdflib_django.store import DjangoStore
@@ -12,7 +12,7 @@ RDF_NAMESPACE = ("rdf", URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 RDFS_NAMESPACE = ("rdfs", URIRef("http://www.w3.org/2000/01/rdf-schema#"))
 
 
-class NamespaceTest(unittest.TestCase):
+class NamespaceTest(TestCase):
     """
     Tests for the weird behavior of RDFlib graphs and the default
     namespaces.
@@ -31,7 +31,8 @@ class NamespaceTest(unittest.TestCase):
         self.assertIn(RDF_NAMESPACE, namespaces)
         self.assertIn(RDFS_NAMESPACE, namespaces)
 
-        # and again; by default, initializing the graph will re-bind the namespaces
+        # and again; by default,
+        # initializing the graph will re-bind the namespaces
         # using a naive implementation, this will fail.
         g = Graph(store=self.store)
         g_namespaces = list(g.namespaces())

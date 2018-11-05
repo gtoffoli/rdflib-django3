@@ -1,6 +1,8 @@
 rdflib-django
 =============
 
+FORK: mission: python3, bnode integration, more features
+
 A store implementation for `rdflib`_ that uses Django as its backend.
 
 The current implementation is context-aware but not formula-aware.
@@ -87,4 +89,3 @@ License
 
 .. _rdflib: http://pypi.python.org/pypi/rdflib/
 .. _MIT license: https://raw.github.com/publysher/rdflib-django/master/LICENSE
-

@@ -1,18 +1,18 @@
 """
 Unittests based on the tests in the rdflib-extras package
 """
-from django import test
+from django.test import TestCase
 from rdflib.graph import Graph, ConjunctiveGraph
 from rdflib.term import URIRef, BNode
 
 
 # pylint: disable=C0111,R0915
-class GraphTest(test.TestCase):
+class GraphTest(TestCase):
     """
     Testing the basic graph functionality.
 
     Heavily based on https://github.com/RDFLib/rdflib-postgresql/blob/master/test/graph_case.py
-    """
+    """  # noqa: E501
     store_name = "Django"
     storetest = True
     path = ''
@@ -238,15 +238,15 @@ n3testdoc = """@prefix : <http://example.org/> .
 """
 
 
-nttestdoc = "<http://example.org/a> <http://example.org/b> <http://example.org/c> .\n"
+nttestdoc = "<http://example.org/a> <http://example.org/b> <http://example.org/c> .\n"  # noqa: E501
 
 
-class ContextTest(test.TestCase):
+class ContextTest(TestCase):
     """
     Testing different contexts.
 
     Heavily based on https://github.com/RDFLib/rdflib-postgresql/blob/master/test/context_case.py
-    """
+    """  # noqa: E501
     store_name = "Django"
     storetest = True
     path = ""
@@ -272,8 +272,8 @@ class ContextTest(test.TestCase):
         self.graph.close()
 
     def get_context(self, identifier):
-        assert isinstance(identifier, URIRef) or isinstance(identifier, BNode), type(identifier)
-        return Graph(store=self.graph.store, identifier=identifier, namespace_manager=self)
+        assert isinstance(identifier, URIRef) or isinstance(identifier, BNode), type(identifier)  # noqa: E501
+        return Graph(store=self.graph.store, identifier=identifier, namespace_manager=self)  # noqa: E501
 
     def addStuff(self):
         tarek = self.tarek

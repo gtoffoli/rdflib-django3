@@ -27,14 +27,17 @@ def _get_query_sets_for_object(o):
     If the object is unknown, it will return both the LiteralStatement and Statement query sets.
 
     This method always returns a list of size at least one.
-    """
+    """  # noqa: E501
     if o:
         if isinstance(o, Literal):
             query_sets = [models.LiteralStatement.objects]
         else:
             query_sets = [models.URIStatement.objects]
     else:
-        query_sets = [models.URIStatement.objects, models.LiteralStatement.objects]
+        query_sets = [
+            models.URIStatement.objects,
+            models.LiteralStatement.objects
+        ]
     return query_sets
 
 
@@ -45,7 +48,9 @@ def _get_named_graph(context):
     if context is None:
         return None
 
-    return models.NamedGraph.objects.get_or_create(identifier=context.identifier)[0]
+    return models.NamedGraph.objects.get_or_create(
+        identifier=context.identifier
+    )[0]
 
 
 class DjangoStore(rdflib.store.Store):
@@ -80,7 +85,7 @@ class DjangoStore(rdflib.store.Store):
     ValueError: multiple stores are not allowed
 
 
-    """
+    """  # noqa: E501
 
     context_aware = True
     formula_aware = False
@@ -102,7 +107,7 @@ class DjangoStore(rdflib.store.Store):
         >>> g = rdflib.Graph('Django')
         >>> g.open(configuration=None, create=False) == rdflib.store.VALID_STORE
         True
-        """
+        """  # noqa: E501
         return VALID_STORE
 
     def destroy(self, configuration=None):
@@ -118,12 +123,12 @@ class DjangoStore(rdflib.store.Store):
         >>> g.destroy(configuration=None)
         >>> g.open(configuration=None, create=False) == rdflib.store.VALID_STORE
         True
-        """
+        """  # noqa: E501
         models.NamedGraph.objects.all().delete()
         models.URIStatement.objects.all().delete()
         models.LiteralStatement.objects.all().delete()
 
-    def add(self, (s, p, o), context, quoted=False):
+    def add(self, triple, context, quoted=False):
         """
         Adds a triple to the store.
 
@@ -138,6 +143,7 @@ class DjangoStore(rdflib.store.Store):
         1
 
         """
+        s, p, o = triple
         assert isinstance(s, Identifier)
         assert isinstance(p, Identifier)
         assert isinstance(o, Identifier)
@@ -153,10 +159,11 @@ class DjangoStore(rdflib.store.Store):
             context=named_graph,
             )
 
-    def remove(self, (s, p, o), context=None):
+    def remove(self, triple, context=None):
         """
         Removes a triple from the store.
         """
+        s, p, o = triple
         named_graph = _get_named_graph(context)
         query_sets = _get_query_sets_for_object(o)
 
@@ -170,15 +177,16 @@ class DjangoStore(rdflib.store.Store):
         if o:
             filter_parameters['object'] = o
 
-        query_sets = [qs.filter(**filter_parameters) for qs in query_sets]  # pylint: disable=W0142
+        query_sets = [qs.filter(**filter_parameters) for qs in query_sets]
 
         for qs in query_sets:
             qs.delete()
 
-    def triples(self, (s, p, o), context=None):
+    def triples(self, triple, context=None):
         """
         Returns all triples in the current store.
         """
+        s, p, o = triple
         named_graph = _get_named_graph(context)
         query_sets = _get_query_sets_for_object(o)
 
@@ -192,7 +200,7 @@ class DjangoStore(rdflib.store.Store):
         if o:
             filter_parameters['object'] = o
 
-        query_sets = [qs.filter(**filter_parameters) for qs in query_sets]  # pylint: disable=W0142
+        query_sets = [qs.filter(**filter_parameters) for qs in query_sets]
 
         for qs in query_sets:
             for statement in qs:
@@ -205,11 +213,22 @@ class DjangoStore(rdflib.store.Store):
         """
         named_graph = _get_named_graph(context)
         if named_graph is not None:
-            return (models.LiteralStatement.objects.filter(context_id=named_graph.id).count()
-                    + models.URIStatement.objects.filter(context_id=named_graph.id).count())
+            return (
+                models.LiteralStatement.objects.filter(
+                    context_id=named_graph.id
+                ).count() +
+                models.URIStatement.objects.filter(
+                    context_id=named_graph.id
+                ).count()
+            )
         else:
-            return (models.URIStatement.objects.values('subject', 'predicate', 'object').distinct().count()
-                    + models.LiteralStatement.objects.values('subject', 'predicate', 'object').distinct().count())
+            return (
+                models.URIStatement.objects.values(
+                    'subject', 'predicate', 'object'
+                ).distinct().count() +
+                models.LiteralStatement.objects.values(
+                    'subject', 'predicate', 'object'
+                ).distinct().count())
 
     ####################
     # CONTEXT MANAGEMENT
@@ -223,7 +242,7 @@ class DjangoStore(rdflib.store.Store):
 
     def bind(self, prefix, namespace):
         for ns in DEFAULT_NAMESPACES:
-            if ns[0] == prefix or unicode(ns[1]) == unicode(namespace):
+            if ns[0] == prefix or str(ns[1]) == str(namespace):
                 return
 
         try:

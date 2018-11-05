@@ -1,14 +1,14 @@
 """
 Taken from https://github.com/RDFLib/rdflib/blob/master/test/test_seq.py
 """
-import unittest
+from django.test import TestCase
 
 from rdflib.term import URIRef
 from rdflib.graph import Graph
 from rdflib_django.store import DjangoStore
 
 
-class SeqTest(unittest.TestCase):
+class SeqTest(TestCase):
     """
     Tests sequences.
     """
@@ -27,8 +27,12 @@ class SeqTest(unittest.TestCase):
         """
         items = self.store.seq(URIRef("http://example.org/Seq"))
         self.assertEquals(len(items), 6)
-        self.assertEquals(items[-1].concrete(), URIRef("http://example.org/six"))
-        self.assertEquals(items[2].concrete(), URIRef("http://example.org/three"))
+        self.assertEquals(
+            items[-1].concrete(), URIRef("http://example.org/six")
+        )
+        self.assertEquals(
+            items[2].concrete(), URIRef("http://example.org/three")
+        )
         # just make sure we can serialize
         self.store.serialize()
 

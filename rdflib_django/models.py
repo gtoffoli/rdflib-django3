@@ -3,10 +3,9 @@ The rdflib_django implementation uses Django models to store its triples.
 
 The underlying models are Resource centric, because rdflib-django is intended
 to be used for publishing resources.
-"""
+"""  # noqa: E501
 from django.db import models
-from django.utils.translation import ugettext as _
-from django_extensions.db.fields import UUIDField
+from django.utils.translation import gettext_lazy as _
 from rdflib_django import fields
 
 
@@ -32,11 +31,17 @@ class NamespaceModel(models.Model):
     In essence, a namespace consists of a prefix and a URI. However, the namespaces in rdflib_django
     also have an extra field called '`fixed`' - this is used to mark namespaces that cannot be
     remapped such as ``xml``, ``rdf`` and ``rdfs``.
-    """
+    """  # noqa: E501
 
-    prefix = models.CharField(max_length=50, verbose_name=_("Prefix"), unique=True)
-    uri = models.CharField(max_length=500, verbose_name=_("URI"), db_index=True, unique=True)
-    fixed = models.BooleanField(verbose_name=_("Fixed"), editable=False, default=False)
+    prefix = models.CharField(
+        max_length=50, verbose_name=_("Prefix"), unique=True
+    )
+    uri = models.CharField(
+        max_length=500, verbose_name=_("URI"), db_index=True, unique=True
+    )
+    fixed = models.BooleanField(
+        verbose_name=_("Fixed"), editable=False, default=False
+    )
 
     class Meta:
         verbose_name = _("namespace")
@@ -51,17 +56,20 @@ class URIStatement(models.Model):
     Statement where the object is a URI.
     """
 
-    id = UUIDField("ID", primary_key=True)
+    id = models.UUIDField("ID", primary_key=True)
     subject = fields.URIField(verbose_name=_("Subject"), db_index=True)
     predicate = fields.URIField(_("Predicate"), db_index=True)
     object = fields.URIField(_("Object"), db_index=True)
-    context = models.ForeignKey(NamedGraph, verbose_name=_("Context"))
+    context = models.ForeignKey(
+        NamedGraph, verbose_name=_("Context"),
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         unique_together = ('subject', 'predicate', 'object', 'context')
 
-    def __unicode__(self):
-        return u"{0}, {1}".format(self.as_triple(), self.context.identifier)    # pylint: disable=E1101
+    def __str__(self):
+        return "{}, {}".format(self.as_triple(), self.context.identifier)
 
     def as_triple(self):
         """
@@ -75,17 +83,20 @@ class LiteralStatement(models.Model):
     Statement where the object is a literal.
     """
 
-    id = UUIDField("ID", primary_key=True)
+    id = models.UUIDField("ID", primary_key=True)
     subject = fields.URIField(verbose_name=_("Subject"), db_index=True)
     predicate = fields.URIField(_("Predicate"), db_index=True)
     object = fields.LiteralField(_("Object"), db_index=True)
-    context = models.ForeignKey(NamedGraph, verbose_name=_("Context"))
+    context = models.ForeignKey(
+        NamedGraph, verbose_name=_("Context"),
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         unique_together = ('subject', 'predicate', 'object', 'context')
 
-    def __unicode__(self):
-        return u"{0}, {1}".format(self.as_triple(), self.context.identifier)    # pylint: disable=E1101
+    def __str__(self):
+        return "{}, {}".format(self.as_triple(), self.context.identifier)
 
     def as_triple(self):
         """
