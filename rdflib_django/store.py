@@ -73,7 +73,9 @@ class DjangoStore(rdflib.store.Store):
     transaction_aware = False
 
     def __init__(self, configuration=None, identifier=DEFAULT_STORE):
-
+        self.store = models.Store.objects.get_or_create(
+            identifier=identifier
+        )[0]
         self.identifier = identifier
         super(DjangoStore, self).__init__(configuration, identifier)
         self.open()
@@ -84,13 +86,8 @@ class DjangoStore(rdflib.store.Store):
         """
         if context is None:
             return None
-
-        store = models.Store.objects.get_or_create(
-            identifier=self.identifier
-        )[0]
-
         return models.NamedGraph.objects.get_or_create(
-            identifier=context.identifier, store=store
+            identifier=context.identifier, store=self.store
         )[0]
 
     def open(self, configuration=None, create=False):
@@ -226,10 +223,7 @@ class DjangoStore(rdflib.store.Store):
     # CONTEXT MANAGEMENT
 
     def contexts(self, triple=None):
-        store = models.Store.objects.get_or_create(
-            identifier=self.identifier
-        )[0]
-        return models.NamedGraph.objects.filter(store=store).values_list(
+        return models.NamedGraph.objects.filter(store=self.store).values_list(
             "identifier", flat=True
         )
 
@@ -237,19 +231,16 @@ class DjangoStore(rdflib.store.Store):
     # NAMESPACE MANAGEMENT
 
     def bind(self, prefix, namespace):
-        store = models.Store.objects.get_or_create(
-            identifier=self.identifier
-        )[0]
         NamespaceModel.objects.filter(
             Q(uri=namespace) | Q(prefix=prefix),
-            fixed=False, store=store
+            fixed=False, store=self.store
         ).delete()
 
         try:
             with transaction.atomic():
                 NamespaceModel.objects.create(
                     prefix=prefix, uri=namespace, fixed=False,
-                    store=store
+                    store=self.store
                 )
         except IntegrityError:
             # is a fixed namespace
@@ -257,28 +248,24 @@ class DjangoStore(rdflib.store.Store):
 
     def prefix(self, namespace):
         try:
-            ns = NamespaceModel.objects.get(uri=namespace)
+            ns = NamespaceModel.objects.get(
+                uri=namespace,
+                store=self.store
+            )
             return ns.prefix
         except NamespaceModel.DoesNotExist:
             return None
 
     def namespace(self, prefix):
-        store = models.Store.objects.get_or_create(
-            identifier=self.identifier
-        )[0]
-
         try:
             ns = NamespaceModel.objects.get(
-                prefix=prefix, store=store
+                prefix=prefix, store=self.store
             )
             return ns.uri
         except NamespaceModel.DoesNotExist:
             return None
 
     def namespaces(self):
-        store = models.Store.objects.get_or_create(
-            identifier=self.identifier
-        )[0]
-        return NamespaceModel.objects.filter(store=store).values_list(
+        return NamespaceModel.objects.filter(store=self.store).values_list(
             "prefix", "uri"
         )
