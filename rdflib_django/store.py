@@ -37,18 +37,6 @@ def _get_query_sets_for_object(o):
     return query_sets
 
 
-def _get_named_graph(context):
-    """
-    Returns the named graph for this context.
-    """
-    if context is None:
-        return None
-
-    return models.NamedGraph.objects.get_or_create(
-        identifier=context.identifier
-    )[0]
-
-
 class DjangoStore(rdflib.store.Store):
     """
     RDFlib Store implementation the uses Django Models for storage and retrieval.
@@ -73,12 +61,9 @@ class DjangoStore(rdflib.store.Store):
     >>> g.store.identifier
     'Default Store'
 
-    Using other stores is not allowed
+    Using other stores is allowed
 
     >>> g = DjangoStore(identifier='HelloWorld')
-    Traceback (most recent call last):
-        ...
-    ValueError: multiple stores are not allowed
 
 
     """  # noqa: E501
@@ -88,12 +73,25 @@ class DjangoStore(rdflib.store.Store):
     transaction_aware = False
 
     def __init__(self, configuration=None, identifier=DEFAULT_STORE):
-        if identifier and identifier != DEFAULT_STORE:
-            raise ValueError("multiple stores are not allowed")
 
-        self.identifier = DEFAULT_STORE
+        self.identifier = identifier
         super(DjangoStore, self).__init__(configuration, identifier)
         self.open()
+
+    def _get_named_graph(self, context):
+        """
+        Returns the named graph for this context.
+        """
+        if context is None:
+            return None
+
+        store = models.Store.objects.get_or_create(
+            identifier=self.identifier
+        )[0]
+
+        return models.NamedGraph.objects.get_or_create(
+            identifier=context.identifier, store=store
+        )[0]
 
     def open(self, configuration=None, create=False):
         """
@@ -120,9 +118,7 @@ class DjangoStore(rdflib.store.Store):
         >>> g.open(configuration=None, create=False) == rdflib.store.VALID_STORE
         True
         """  # noqa: E501
-        models.NamedGraph.objects.all().delete()
-        models.URIStatement.objects.all().delete()
-        models.LiteralStatement.objects.all().delete()
+        models.Store.objects.filter(identifier=self.identifier).delete()
 
     def add(self, triple, context, quoted=False):
         """
@@ -133,7 +129,7 @@ class DjangoStore(rdflib.store.Store):
 
         >>> subject = URIRef('http://zoowizard.org/resource/Artis')
         >>> object = URIRef('http://schema.org/Zoo')
-        >>> g = rdflib.Graph('Django')
+        >>> g = rdflib.Graph('Django', identifier="foo")
         >>> g.add((subject, RDF.type, object))
         >>> len(g)
         1
@@ -145,7 +141,7 @@ class DjangoStore(rdflib.store.Store):
         assert isinstance(o, Identifier)
         assert not quoted
 
-        named_graph = _get_named_graph(context)
+        named_graph = self._get_named_graph(context)
 
         query_set = _get_query_sets_for_object(o)[0]
         query_set.get_or_create(
@@ -160,7 +156,7 @@ class DjangoStore(rdflib.store.Store):
         Removes a triple from the store.
         """
         s, p, o = triple
-        named_graph = _get_named_graph(context)
+        named_graph = self._get_named_graph(context)
         query_sets = _get_query_sets_for_object(o)
 
         filter_parameters = dict()
@@ -183,7 +179,7 @@ class DjangoStore(rdflib.store.Store):
         Returns all triples in the current store.
         """
         s, p, o = triple
-        named_graph = _get_named_graph(context)
+        named_graph = self._get_named_graph(context)
         query_sets = _get_query_sets_for_object(o)
 
         filter_parameters = dict()
@@ -207,7 +203,7 @@ class DjangoStore(rdflib.store.Store):
         """
         Returns the number of statements in this Graph.
         """
-        named_graph = _get_named_graph(context)
+        named_graph = self._get_named_graph(context)
         if named_graph is not None:
             return (
                 models.LiteralStatement.objects.filter(
@@ -230,22 +226,30 @@ class DjangoStore(rdflib.store.Store):
     # CONTEXT MANAGEMENT
 
     def contexts(self, triple=None):
-        for c in models.NamedGraph.objects.all():
-            yield c.identifier
+        store = models.Store.objects.get_or_create(
+            identifier=self.identifier
+        )[0]
+        return models.NamedGraph.objects.filter(store=store).values_list(
+            "identifier", flat=True
+        )
 
     ######################
     # NAMESPACE MANAGEMENT
 
     def bind(self, prefix, namespace):
+        store = models.Store.objects.get_or_create(
+            identifier=self.identifier
+        )[0]
         NamespaceModel.objects.filter(
             Q(uri=namespace) | Q(prefix=prefix),
-            fixed=False
+            fixed=False, store=store
         ).delete()
 
         try:
             with transaction.atomic():
                 NamespaceModel.objects.create(
-                    prefix=prefix, uri=namespace, fixed=False
+                    prefix=prefix, uri=namespace, fixed=False,
+                    store=store
                 )
         except IntegrityError:
             # is a fixed namespace
@@ -259,13 +263,22 @@ class DjangoStore(rdflib.store.Store):
             return None
 
     def namespace(self, prefix):
+        store = models.Store.objects.get_or_create(
+            identifier=self.identifier
+        )[0]
+
         try:
-            ns = NamespaceModel.objects.get(prefix=prefix)
+            ns = NamespaceModel.objects.get(
+                prefix=prefix, store=store
+            )
             return ns.uri
         except NamespaceModel.DoesNotExist:
             return None
 
     def namespaces(self):
-        return NamespaceModel.objects.all().values_list(
+        store = models.Store.objects.get_or_create(
+            identifier=self.identifier
+        )[0]
+        return NamespaceModel.objects.filter(store=store).values_list(
             "prefix", "uri"
         )

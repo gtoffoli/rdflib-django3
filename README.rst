@@ -1,7 +1,9 @@
-rdflib-django
+rdflib-django3
 =============
 
-FORK: mission: python3, bnode integration, more features
+
+fork from rdflib-django with multi store architecture, python3 and recent rdflib
+compatibility.
 
 A store implementation for `rdflib`_ that uses Django as its backend.
 
@@ -39,7 +41,7 @@ Getting a graph using rdflib's store API:
 ::
 
     from rdflib import Graph
-    graph = Graph('Django')
+    graph = Graph('Django', identifier="fooo")
     graph.open(create=True)
 
 This example will give you a graph identified by a blank node within the

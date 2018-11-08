@@ -10,12 +10,32 @@ from django.utils.translation import gettext_lazy as _
 from rdflib_django import fields
 
 
+class Store(models.Model):
+    """
+    Models a store of a named graph.
+    """
+
+    identifier = models.CharField(
+        verbose_name=_("Identifier"), unique=True, max_length=255
+    )
+
+    class Meta:
+        verbose_name = _("Store")
+
+    def __str__(self):
+        return "{}-{}".format(self.identifier, "identifier")
+
+
 class NamedGraph(models.Model):
     """
     Models a context which represents a named graph.
     """
 
     identifier = fields.URIField(verbose_name=_("Identifier"), unique=True)
+
+    store = models.ForeignKey(
+        Store, verbose_name=_("Store"), on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = _("named graph")
@@ -42,6 +62,9 @@ class NamespaceModel(models.Model):
     )
     fixed = models.BooleanField(
         verbose_name=_("Fixed"), editable=False, default=False
+    )
+    store = models.ForeignKey(
+        Store, verbose_name=_("Store"), on_delete=models.CASCADE
     )
 
     class Meta:
@@ -87,7 +110,7 @@ class LiteralStatement(models.Model):
     id = models.UUIDField("ID", default=uuid.uuid4, primary_key=True)
     subject = fields.URIField(verbose_name=_("Subject"), db_index=True)
     predicate = fields.URIField(_("Predicate"), db_index=True)
-    object = fields.LiteralField(_("Object"), db_index=True)
+    object = fields.LiteralField(_("Object"))
     context = models.ForeignKey(
         NamedGraph, verbose_name=_("Context"),
         on_delete=models.CASCADE
