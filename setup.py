@@ -5,11 +5,13 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 VERSIONING = {
     'root': '.',
     'version_scheme': 'guess-next-dev',
     'local_scheme': 'dirty-tag',
 }
+
 
 setup(
     name="rdflib-django3",
@@ -42,5 +44,4 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    #test_suite="test.test_all"
 )
