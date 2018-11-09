@@ -5,10 +5,16 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+VERSIONING = {
+    'root': '.',
+    'version_scheme': 'guess-next-dev',
+    'local_scheme': 'dirty-tag',
+}
 
 setup(
     name="rdflib-django3",
-    version="0.1",
+    use_scm_version=VERSIONING,
+    setup_requires=['setuptools_scm'],
     url="http://github.com/devkral/rdflib-django3",
     license='MIT',
     description="Store implementation for RDFlib using Django models as its backend (fork)",  # noqa
