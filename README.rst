@@ -8,12 +8,11 @@ compatibility.
 A store implementation for `rdflib`_ that uses Django as its backend.
 
 The current implementation is context-aware but not formula-aware.
-Furthermore, performance has not yet been considered.
 
 The implementation assumes that contexts are used for named graphs.
 
-.. image:: https://secure.travis-ci.org/publysher/rdflib-django.png
-   :target: https://travis-ci.org/#!/publysher/rdflib-django
+.. image:: https://secure.travis-ci.org/devkral/rdflib-django.png
+   :target: https://travis-ci.org/#!/devkral/rdflib-django
 
 Quick start
 -----------
@@ -90,4 +89,4 @@ License
 ``rdflib-django`` is licensed under the `MIT license`_.
 
 .. _rdflib: http://pypi.python.org/pypi/rdflib/
-.. _MIT license: https://raw.github.com/publysher/rdflib-django/master/LICENSE
+.. _MIT license: https://raw.github.com/devkral/rdflib-django/master/LICENSE

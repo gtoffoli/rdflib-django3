@@ -12,7 +12,9 @@ extra_namespaces = [
 ]
 
 
-def UpdateNamespaces(sender, instance, **kwargs):
+def UpdateNamespaces(sender, instance, created, **kwargs):
+    if not created:
+        return
     from .models import NamespaceModel
     from django.db.models import Q
     from rdflib import namespace
