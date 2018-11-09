@@ -11,17 +11,17 @@ The current implementation is context-aware but not formula-aware.
 
 The implementation assumes that contexts are used for named graphs.
 
-.. image:: https://secure.travis-ci.org/devkral/rdflib-django.png
-   :target: https://travis-ci.org/#!/devkral/rdflib-django
+.. image:: https://secure.travis-ci.org/devkral/rdflib-django3.png
+   :target: https://travis-ci.org/#!/devkral/rdflib-django3
 
 Quick start
 -----------
 
-Install rdflib-django with your package manager:
+Install rdflib-django3 with your package manager:
 
 ::
 
-    pip install rdflib-django
+    pip install rdflib-django3
 
 Add ``rdflib_django`` to your ``INSTALLED_APPS``:
 
@@ -64,7 +64,7 @@ Getting a named graph using rdflib-django's API:
     from rdflib_django import utils
     graph = utils.get_named_graph('http://example.com')
 
-Getting the conjunctive graph using rdflib-django's API:
+Getting the conjunctive graph using rdflib-django3's API:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
@@ -75,7 +75,7 @@ Getting the conjunctive graph using rdflib-django's API:
 Management commands
 -------------------
 
-``rdflib-django`` includes two management commands to import and export
+``rdflib-django3`` includes two management commands to import and export
 RDF:
 
 ::
@@ -86,7 +86,8 @@ RDF:
 License
 -------
 
-``rdflib-django`` is licensed under the `MIT license`_.
+``rdflib-django3`` is licensed under the `MIT license`_.
 
 .. _rdflib: http://pypi.python.org/pypi/rdflib/
-.. _MIT license: https://raw.github.com/devkral/rdflib-django/master/LICENSE
+.. _MIT license: https://raw.github.com/devkral/rdflib-django3/master/LICENSE
+.. _MIT license: https://raw.github.com/devkral/rdflib-django/master/LICENSE.publysher
