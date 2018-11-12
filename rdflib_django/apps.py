@@ -18,25 +18,33 @@ def UpdateNamespaces(sender, instance, created, **kwargs):
     from .models import NamespaceModel
     from django.db.models import Q
     from rdflib import namespace
+
     for val in extra_namespaces:
-        val2 = val.copy()
-        fixed = val2.pop("fixed", False)
-        store = instance
-        if fixed:
-            store = None
-        if not NamespaceModel.objects.filter(
-            Q(uri=val2["uri"]) | Q(prefix=val2["prefix"]),
-            store=store
-        ):
-            NamespaceModel.objects.create(
-                store=store,
-                **val2
-            )
-        if not store:
-            # cleanup old namespaces
-            NamespaceModel.objects.filter(
-                Q(uri=val["uri"]) | Q(prefix=val["prefix"])
-            ).exclude(store__isnull=True).delete()
+        if not val.get("fixed", False):
+            if not NamespaceModel.objects.filter(
+                Q(uri=val["uri"]) | Q(prefix=val["prefix"]),
+                store=instance
+            ):
+                NamespaceModel.objects.create(
+                    store=instance,
+                    uri=val["uri"],
+                    prefix=val["prefix"]
+                )
+        else:
+            if not NamespaceModel.objects.filter(
+                Q(uri=val["uri"]) & Q(prefix=val["prefix"]),
+                store=None
+            ):
+                # cleanup old namespaces
+                NamespaceModel.objects.filter(
+                    Q(uri=val["uri"]) | Q(prefix=val["prefix"])
+                ).delete()
+                NamespaceModel.objects.create(
+                    store=None,
+                    uri=val["uri"],
+                    prefix=val["prefix"]
+                )
+
     for key in namespace.__all__:
         val = getattr(namespace, key)
         if isinstance(val, namespace.Namespace):
@@ -51,9 +59,13 @@ def UpdateNamespaces(sender, instance, created, **kwargs):
                 )
         elif isinstance(val, namespace.ClosedNamespace):
             if not NamespaceModel.objects.filter(
-                Q(uri=val.uri) | Q(prefix=key.lower()),
+                Q(uri=val.uri) & Q(prefix=key.lower()),
                 store=None
             ):
+                NamespaceModel.objects.filter(
+                    Q(uri=val.uri) | Q(prefix=key.lower()),
+                    store=None
+                ).delete()
                 NamespaceModel.objects.create(
                     prefix=key.lower(),
                     uri=val.uri,
