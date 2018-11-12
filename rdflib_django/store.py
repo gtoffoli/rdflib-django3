@@ -1,14 +1,11 @@
 """
 Essential implementation of the Store interface defined by RDF lib.
 """
-from django.db.utils import IntegrityError
-from django.db import transaction
 from django.db.models import Q
 import rdflib
 from rdflib.store import VALID_STORE
 from rdflib.term import Literal, Identifier
 from rdflib_django import models
-from rdflib_django.models import NamespaceModel
 
 
 DEFAULT_STORE = "Default Store"
@@ -73,10 +70,10 @@ class DjangoStore(rdflib.store.Store):
     transaction_aware = False
 
     def __init__(self, configuration=None, identifier=DEFAULT_STORE):
+        self.identifier = identifier
         self.store = models.Store.objects.get_or_create(
             identifier=identifier
         )[0]
-        self.identifier = identifier
         super(DjangoStore, self).__init__(configuration, identifier)
         self.open()
 
@@ -231,41 +228,44 @@ class DjangoStore(rdflib.store.Store):
     # NAMESPACE MANAGEMENT
 
     def bind(self, prefix, namespace):
-        NamespaceModel.objects.filter(
+        # is fixed
+        if models.NamespaceModel.objects.filter(
             Q(uri=namespace) | Q(prefix=prefix),
-            fixed=False, store=self.store
+            store__isnull=True
+        ).exists():
+            return
+        assert(self.store is not None)
+        models.NamespaceModel.objects.filter(
+            Q(uri=namespace) | Q(prefix=prefix),
+            store=self.store
         ).delete()
-
-        try:
-            with transaction.atomic():
-                NamespaceModel.objects.create(
-                    prefix=prefix, uri=namespace, fixed=False,
-                    store=self.store
-                )
-        except IntegrityError:
-            # is a fixed namespace
-            pass
+        models.NamespaceModel.objects.create(
+            prefix=prefix, uri=namespace, store=self.store
+        )
 
     def prefix(self, namespace):
         try:
-            ns = NamespaceModel.objects.get(
-                uri=namespace,
-                store=self.store
+            ns = models.NamespaceModel.objects.get(
+                Q(store=self.store) | Q(store=None),
+                uri=namespace
             )
             return ns.prefix
-        except NamespaceModel.DoesNotExist:
+        except models.NamespaceModel.DoesNotExist:
             return None
 
     def namespace(self, prefix):
         try:
-            ns = NamespaceModel.objects.get(
-                prefix=prefix, store=self.store
+            ns = models.NamespaceModel.objects.get(
+                Q(store=self.store) | Q(store=None),
+                prefix=prefix
             )
             return ns.uri
-        except NamespaceModel.DoesNotExist:
+        except models.NamespaceModel.DoesNotExist:
             return None
 
     def namespaces(self):
-        return NamespaceModel.objects.filter(store=self.store).values_list(
+        return models.NamespaceModel.objects.filter(
+            Q(store=self.store) | Q(store=None)
+        ).values_list(
             "prefix", "uri"
         )

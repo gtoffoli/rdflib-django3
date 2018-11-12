@@ -19,14 +19,24 @@ def UpdateNamespaces(sender, instance, created, **kwargs):
     from django.db.models import Q
     from rdflib import namespace
     for val in extra_namespaces:
+        val2 = val.copy()
+        fixed = val2.pop("fixed", False)
+        store = instance
+        if fixed:
+            store = None
         if not NamespaceModel.objects.filter(
-            Q(uri=val["uri"]) | Q(prefix=val["prefix"]),
-            store=instance
+            Q(uri=val2["uri"]) | Q(prefix=val2["prefix"]),
+            store=store
         ):
             NamespaceModel.objects.create(
-                store=instance,
-                **val
+                store=store,
+                **val2
             )
+        if not store:
+            # cleanup old namespaces
+            NamespaceModel.objects.filter(
+                Q(uri=val["uri"]) | Q(prefix=val["prefix"])
+            ).exclude(store__isnull=True).delete()
     for key in namespace.__all__:
         val = getattr(namespace, key)
         if isinstance(val, namespace.Namespace):
@@ -35,7 +45,6 @@ def UpdateNamespaces(sender, instance, created, **kwargs):
                 store=instance
             ):
                 NamespaceModel.objects.create(
-                    fixed=False,
                     prefix=key.lower(),
                     uri=val.uri,
                     store=instance
@@ -43,14 +52,17 @@ def UpdateNamespaces(sender, instance, created, **kwargs):
         elif isinstance(val, namespace.ClosedNamespace):
             if not NamespaceModel.objects.filter(
                 Q(uri=val.uri) | Q(prefix=key.lower()),
-                store=instance
+                store=None
             ):
                 NamespaceModel.objects.create(
-                    fixed=True,
                     prefix=key.lower(),
                     uri=val.uri,
-                    store=instance
+                    store=None
                 )
+            # cleanup old namespaces
+            NamespaceModel.objects.filter(
+                Q(uri=val.uri) | Q(prefix=key.lower())
+            ).exclude(store__isnull=True).delete()
 
 
 class RdflibDjangoConfig(AppConfig):

@@ -16,7 +16,8 @@ class Store(models.Model):
     """
 
     identifier = models.CharField(
-        verbose_name=_("Identifier"), unique=True, max_length=255
+        verbose_name=_("Identifier"), unique=True, max_length=255,
+        db_index=True
     )
 
     class Meta:
@@ -31,15 +32,21 @@ class NamedGraph(models.Model):
     Models a context which represents a named graph.
     """
 
-    identifier = fields.URIField(verbose_name=_("Identifier"), unique=True)
+    identifier = fields.URIField(
+        verbose_name=_("Identifier"), db_index=True
+    )
 
     store = models.ForeignKey(
-        Store, verbose_name=_("Store"), on_delete=models.CASCADE
+        Store, verbose_name=_("Store"), on_delete=models.CASCADE,
+        db_index=True
     )
 
     class Meta:
         verbose_name = _("named graph")
         verbose_name_plural = _("named graphs")
+        unique_together = [
+            ("identifier", "store"),
+        ]
 
     def __str__(self):
         return "{}-{}".format(self.identifier, "identifier")
@@ -55,21 +62,23 @@ class NamespaceModel(models.Model):
     """  # noqa: E501
 
     prefix = models.CharField(
-        max_length=50, verbose_name=_("Prefix"), unique=True
+        max_length=50, verbose_name=_("Prefix"), db_index=True
     )
     uri = models.CharField(
-        max_length=500, verbose_name=_("URI"), db_index=True, unique=True
-    )
-    fixed = models.BooleanField(
-        verbose_name=_("Fixed"), editable=False, default=False
+        max_length=500, verbose_name=_("URI"), db_index=True
     )
     store = models.ForeignKey(
-        Store, verbose_name=_("Store"), on_delete=models.CASCADE
+        Store, verbose_name=_("Store"), on_delete=models.CASCADE,
+        null=True
     )
 
     class Meta:
         verbose_name = _("namespace")
         verbose_name_plural = _("namespaces")
+        unique_together = [
+            ("prefix", "store"),
+            ("uri", "store"),
+        ]
 
     def __str__(self):
         return "@prefix {}: <{}>".format(self.prefix, self.uri)

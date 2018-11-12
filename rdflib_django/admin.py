@@ -19,8 +19,8 @@ class NamespaceAdmin(admin.ModelAdmin):
     """
     Admin module for managing namespaces.
     """
-    list_display = ('prefix', 'uri', 'fixed')
-    ordering = ('-fixed', 'prefix')
+    list_display = ('store', 'prefix', 'uri')
+    ordering = ('-store', 'prefix')
     search_fields = ('prefix', 'uri')
     form = forms.NamespaceForm
 
@@ -35,6 +35,7 @@ class NamespaceAdmin(admin.ModelAdmin):
             return False
 
         return super(NamespaceAdmin, self).has_delete_permission(request, obj)
+
 
 admin.site.register(models.NamedGraph, NamedGraphAdmin)
 admin.site.register(models.NamespaceModel, NamespaceAdmin)
