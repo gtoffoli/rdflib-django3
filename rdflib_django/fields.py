@@ -78,6 +78,7 @@ def serialize_uri(value):
         return value.n3()
     if isinstance(value, URIRef):
         return str(value)
+    # neccessary for migrations in some db backends (e.g. postgres)
     if value is None:
         return None
     raise ValueError("Cannot get prepvalue for {} of type {}".format(
