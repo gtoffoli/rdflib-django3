@@ -78,6 +78,8 @@ def serialize_uri(value):
         return value.n3()
     if isinstance(value, URIRef):
         return str(value)
+    if value is None:
+        return None
     raise ValueError("Cannot get prepvalue for {} of type {}".format(
         value, value.__class__)
     )
