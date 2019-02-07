@@ -10,10 +10,10 @@ env:
   - DJANGO="2.1"
   - DJANGO="master"
 matrix:
-  - exclude:
+  exclude:
     - env: DJANGO="master"
       python: "3.5"
-  - allow_failures:
+  allow_failures:
     - env: DJANGO="master"
 after_success: codecov
 install: pip install tox-travis codecov
