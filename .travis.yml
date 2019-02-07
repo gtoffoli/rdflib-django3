@@ -1,4 +1,5 @@
 sudo: false
+dist: xenial
 language: python
 python:
   - "3.5"
@@ -10,11 +11,7 @@ env:
   - DJANGO="master"
 matrix:
   allow_failures:
-    - python: "3.5"
-      env: DJANGO="master"
-    - python: "3.6"
-      env: DJANGO="master"
-    - python: "3.7"
+    - env: DJANGO="master"
 after_success: codecov
 install: pip install tox-travis codecov
 script: tox
