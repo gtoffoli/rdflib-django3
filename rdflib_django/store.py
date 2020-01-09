@@ -3,7 +3,7 @@ Essential implementation of the Store interface defined by RDF lib.
 """
 from django.db.models import Q
 import rdflib
-from rdflib.store import VALID_STORE
+from rdflib.store import VALID_STORE, NO_STORE
 from rdflib.term import Literal, Identifier
 from rdflib_django import models
 
@@ -69,13 +69,12 @@ class DjangoStore(rdflib.store.Store):
     formula_aware = False
     transaction_aware = False
 
+    store = None
+
     def __init__(self, configuration=None, identifier=DEFAULT_STORE):
         self.identifier = identifier
-        self.store = models.Store.objects.get_or_create(
-            identifier=identifier
-        )[0]
         super(DjangoStore, self).__init__(configuration, identifier)
-        self.open()
+        self.open(create=True)
 
     def _get_named_graph(self, context):
         """
@@ -96,6 +95,17 @@ class DjangoStore(rdflib.store.Store):
         >>> g.open(configuration=None, create=False) == rdflib.store.VALID_STORE
         True
         """  # noqa: E501
+        if create:
+            self.store = models.Store.objects.get_or_create(
+                identifier=self.identifier
+            )[0]
+        else:
+            self.store = models.Store.objects.filter(
+                identifier=self.identifier
+            ).first()
+            if not self.store:
+                return NO_STORE
+
         return VALID_STORE
 
     def destroy(self, configuration=None):
@@ -112,7 +122,7 @@ class DjangoStore(rdflib.store.Store):
         >>> g.open(configuration=None, create=False) == rdflib.store.VALID_STORE
         True
         """  # noqa: E501
-        models.Store.objects.filter(identifier=self.identifier).delete()
+        self.store.delete()
 
     def add(self, triple, context, quoted=False):
         """
