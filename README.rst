@@ -1,5 +1,5 @@
 rdflib-django3
-=============
+==============
 
 
 fork from rdflib-django with multi store architecture, python3 and recent rdflib
@@ -90,4 +90,3 @@ License
 
 .. _rdflib: http://pypi.python.org/pypi/rdflib/
 .. _MIT license: https://raw.github.com/devkral/rdflib-django3/master/LICENSE
-.. _MIT license: https://raw.github.com/devkral/rdflib-django/master/LICENSE.publysher

@@ -22,6 +22,7 @@ setup(
     license='MIT',
     description="Store implementation for RDFlib using Django models as its backend (fork)",  # noqa
     long_description=read('README.rst'),
+    long_description_content_type="text/x-rst",
     keywords='django rdf rdflib store',
     author='Alexander K., Yigal Duppen',
     author_email='devkral@web.de, yigal@publysher.nl',
