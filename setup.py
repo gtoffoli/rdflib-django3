@@ -27,7 +27,8 @@ setup(
     author_email='devkral@web.de, yigal@publysher.nl',
     packages=find_packages(exclude=["test"]),
     zip_safe=True,
-    install_requires=['rdflib>=3.2.1'],
+    # django < 2.2 is untested.
+    install_requires=['rdflib>=3.2.1', 'django>=2.0'],
     entry_points={
         'rdf.plugins.store': [
             'Django = rdflib_django.store:DjangoStore',
