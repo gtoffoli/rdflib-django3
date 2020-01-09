@@ -191,7 +191,9 @@ class DjangoStore(rdflib.store.Store):
         for qs in query_sets:
             for statement in qs:
                 triple = statement.as_triple()
-                yield triple, context
+                cg_id = statement.context.identifier
+                cg = rdflib.Graph(store=self, identifier=cg_id)
+                yield triple, [cg]  # rdflib expects an iterator
 
     def __len__(self, context=None):
         """
