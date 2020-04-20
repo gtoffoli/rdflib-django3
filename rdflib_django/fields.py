@@ -3,9 +3,10 @@ Custom fields for storing RDF primitives.
 
 Based on http://blog.elsdoerfer.name/2008/01/08/fuzzydates-or-one-django-model-field-multiple-database-columns/
 """  # noqa: E501
-from django.db import models
 from rdflib.graph import Graph
-from rdflib.term import BNode, URIRef, Literal
+from rdflib.term import BNode, Literal, URIRef
+
+from django.db import models
 
 
 class LiteralField(models.TextField):

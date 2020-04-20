@@ -4,7 +4,8 @@ Utility functions for using rdflib_django.
 from rdflib.graph import ConjunctiveGraph, Graph
 from rdflib.store import VALID_STORE
 from rdflib.term import URIRef
-from rdflib_django.store import DjangoStore, DEFAULT_STORE
+
+from .store import DEFAULT_STORE, DjangoStore
 
 
 def get_conjunctive_graph(store_id=None):

@@ -1,12 +1,13 @@
 """
 Essential implementation of the Store interface defined by RDF lib.
 """
-from django.db.models import Q
 import rdflib
-from rdflib.store import VALID_STORE, NO_STORE
-from rdflib.term import Literal, Identifier
-from rdflib_django import models
+from rdflib.store import NO_STORE, VALID_STORE
+from rdflib.term import Identifier, Literal
 
+from django.db.models import Q
+
+from . import models
 
 DEFAULT_STORE = "Default Store"
 

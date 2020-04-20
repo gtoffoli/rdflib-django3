@@ -7,7 +7,7 @@ to be used for publishing resources.
 import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from rdflib_django import fields
+from . import fields
 
 
 class Store(models.Model):

@@ -1,10 +1,13 @@
 """
-Base forms for editing the models in this module. You can use or extend these forms in your
+Base forms for editing the models in this module.
+You can use or extend these forms in your
 project to ensure that all validation is correct.
 """
-from django import forms
-from rdflib_django import models
 from rdflib import namespace
+
+from django import forms
+
+from . import models
 
 
 class NamespaceForm(forms.ModelForm):

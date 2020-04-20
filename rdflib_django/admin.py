@@ -2,7 +2,7 @@
 Defines admin options for this RDFlib implementation.
 """
 from django.contrib import admin
-from rdflib_django import models, forms
+from . import models, forms, store
 
 
 class NamedGraphAdmin(admin.ModelAdmin):
@@ -31,7 +31,7 @@ class NamespaceAdmin(admin.ModelAdmin):
         """
         Default namespaces cannot be deleted.
         """
-        if obj is not None and obj.fixed:
+        if obj is not None and obj.identifier == store.DEFAULT_STORE:
             return False
 
         return super(NamespaceAdmin, self).has_delete_permission(request, obj)
