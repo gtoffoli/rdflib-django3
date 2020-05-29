@@ -23,6 +23,7 @@ Examples:
     """.format(sys.argv[0])  # noqa: E501
 
     def add_arguments(self, parser):
+        parser.add_argument('source', type=str, nargs='?', default=sys.stdin)
         parser.add_argument(
             '--store', '-s', dest='store',
             help='RDF data will be imported into the store with this identifier. If not specified, the default store is used.'  # noqa: E501
@@ -40,13 +41,15 @@ Examples:
 
     @transaction.atomic
     def handle(self, *args, **options):
+        """
         if not args:
             raise CommandError("No file or resource specified.")
+        """
 
         info = options.get('verbosity') >= 2
         store_id = options.get('store')
         context_id = options.get('context')
-        source = args[0]
+        source = options['source'] if options else sys.stdin
 
         if info:
             print("Parsing {}".format(source))

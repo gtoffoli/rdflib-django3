@@ -21,6 +21,7 @@ Examples:
     """.format(sys.argv[0])
 
     def add_arguments(self, parser):
+        parser.add_argument('target', type=str, nargs='?', default=sys.stdout)
         parser.add_argument(
             '--context', '-c', dest='context',
             help='Only RDF data from the context with this identifier will be exported. If not specified, a new blank context is created.'  # noqa: E501
@@ -39,7 +40,7 @@ Examples:
     def handle(self, *args, **options):
         store_id = options.get('store')
         context_id = options.get('context')
-        target = args[0] if args else sys.stdout
+        target = options['target'] if options else sys.stdout
 
         if context_id:
             graph = utils.get_named_graph(
