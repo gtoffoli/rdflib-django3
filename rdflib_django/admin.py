@@ -3,9 +3,11 @@ Defines admin options for this RDFlib implementation.
 """
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminTextareaWidget
-from . import models, fields, forms, store
+
+from . import fields, forms, models, store
 
 
+@admin.register(models.NamedGraph)
 class NamedGraphAdmin(admin.ModelAdmin):
     """
     Admin module for named graphs.
@@ -16,6 +18,7 @@ class NamedGraphAdmin(admin.ModelAdmin):
     search_fields = ('identifier', )
 
 
+@admin.register(models.NamespaceModel)
 class NamespaceAdmin(admin.ModelAdmin):
     """
     Admin module for managing namespaces.
@@ -38,6 +41,7 @@ class NamespaceAdmin(admin.ModelAdmin):
         return super(NamespaceAdmin, self).has_delete_permission(request, obj)
 
 
+@admin.register(models.URIStatement)
 class UriStatementAdmin(admin.ModelAdmin):
     """
     Admin module for URI statements.
@@ -55,8 +59,12 @@ class AdminLiteralInput(AdminTextareaWidget):
         """
         if value is None:
             return None
-        return str(value) + "^^" + str(value.language or '') + "^^" + str(value.datatype or '')
+        return "{}^^{}^^{}".format(
+            value, value.language or '', value.datatype or ''
+        )
 
+
+@admin.register(models.LiteralStatement)
 class LiteralStatementAdmin(admin.ModelAdmin):
     """
     Admin module for literal statements.
@@ -67,10 +75,3 @@ class LiteralStatementAdmin(admin.ModelAdmin):
     formfield_overrides = {
        fields.LiteralField: {'widget': AdminLiteralInput()},
     }
-
-
-admin.site.register(models.NamedGraph, NamedGraphAdmin)
-admin.site.register(models.NamespaceModel, NamespaceAdmin)
-
-admin.site.register(models.URIStatement, UriStatementAdmin)
-admin.site.register(models.LiteralStatement, LiteralStatementAdmin)
