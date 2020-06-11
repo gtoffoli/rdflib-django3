@@ -1,6 +1,8 @@
 """
 Defines admin options for this RDFlib implementation.
 """
+from rdflib.term import BNode
+
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminTextareaWidget
 
@@ -48,7 +50,11 @@ class AdminURIWidget(AdminTextareaWidget):
         """
         Return a value as it should appear when rendered in a form.
         """
-        return fields.serialize_uri(value)
+        # test below shouldn't be necessary if code in fields module was more coherent
+        if isinstance(value, BNode):
+            return fields.serialize_uri(value)
+        else:
+            return value
 
 
 @admin.register(models.URIStatement)
