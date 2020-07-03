@@ -9,7 +9,13 @@ from django.db.models import Q
 
 from . import models
 
-DEFAULT_STORE = "Default Store"
+
+# it seems that rdflib expects store names in URI format
+try:
+    from django.conf import settings
+    DEFAULT_STORE = settings.DEFAULT_STORE
+except:
+    DEFAULT_STORE = "Default Store"
 
 
 def _get_query_sets_for_object(o):
